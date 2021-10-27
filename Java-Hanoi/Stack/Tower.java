@@ -2,17 +2,30 @@ public class Tower implements Stack {
 
     private Plate top;
     private int size;
-    private final int MAX;
+    private static int MAX;
 
-    public Tower(int n){
+    Tower(){}
+
+    public static boolean setMAX(int n){
         MAX = n;
+        return true;
+    }
+
+    public Tower(boolean empty) {
+        
         top = new Plate(true);
-        for (int i = 0; i < MAX; i++) {
-            push(new Plate(false));
+        if (empty) {
+            for (int i = 0; i < MAX; i++) {
+                push(new Plate(false));
+            }
+        }else{
+            for (int i = 0; i < MAX; i++) {
+                push(new Plate(i));
+            } 
         }
     }
 
-    public void test(){
+    public void test() {
         for (int i = 0; i < MAX; i++) {
             try {
                 System.out.println(pop().getVal());
@@ -22,14 +35,11 @@ public class Tower implements Stack {
         }
     }
 
-
-
     public boolean isEmpty() {
-        return size==0;
+        return size == 0;
     }
 
     public boolean push(Plate p) {
-        //if(size==MAX)throw new FullStackException();
         Plate newPlate = p;
         newPlate.setPrev(top);
         top = newPlate;
@@ -37,8 +47,21 @@ public class Tower implements Stack {
         return true;
     }
 
+    protected void increaseSize(){
+        size++;
+    }
+
+    protected Plate getTop(){
+        return top;
+    }
+
+    protected void setTop(Plate p){
+        top = p;
+    }
+
     public Plate pop() throws EmptyStackException {
-        if(size==0)throw new EmptyStackException();
+        if (size == 0)
+            throw new EmptyStackException();
         Plate p = top;
         top = top.getPrev();
         size--;
@@ -46,7 +69,8 @@ public class Tower implements Stack {
     }
 
     public Plate top() throws EmptyStackException {
-        if(size==0)throw new EmptyStackException();
+        if (size == 0)
+            throw new EmptyStackException();
         return top;
     }
 
@@ -54,7 +78,7 @@ public class Tower implements Stack {
         return size;
     }
 
-    public Plate search(){//this method is useless in this project
+    public Plate search() {// this method is useless in this project
         return null;
     }
 }

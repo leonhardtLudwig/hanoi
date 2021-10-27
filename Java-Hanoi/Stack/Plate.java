@@ -11,6 +11,10 @@ public class Plate {
 
     }
 
+    public Plate(int val){
+        this.val = val;
+    }
+
     public Plate(int val, Plate prev) {
         this.val = val;
         this.prev = prev;
