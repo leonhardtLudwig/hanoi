@@ -3,40 +3,45 @@ import java.util.Scanner;
 public class Main {
 
     private static final int N = 4;
+    private static final int MAX_MOVES = N * N - 1;
     private static int[][] towers;
 
     public static void main(String args[]) {
         initTowers();
-        System.out.println("Come on!!!");
+        System.out.println("Come on!!! Use numbers between 1 and 3");
         Scanner t = new Scanner(System.in);
         int begin;
         int end;
-        do{
+        int moves = 0;
+        do {
             printTowers();
             try {
                 System.out.println("First tower");
-                begin = t.nextInt();
+                begin = t.nextInt() - 1;
                 System.out.println("Second tower");
-                end = t.nextInt();
+                end = t.nextInt() - 1;
                 switchTower(begin, end);
-                /*
-                 * switchTower(0, 2); printTowers(); switchTower(0, 1); printTowers();
-                 * switchTower(2, 1); printTowers(); switchTower(0, 2); printTowers();
-                 * switchTower(1, 0); printTowers(); switchTower(1, 2); printTowers();
-                 * switchTower(0, 2); printTowers(); switchTower(0, 1); printTowers();
-                 * switchTower(2, 1); printTowers(); switchTower(2, 0); printTowers();
-                 * switchTower(1, 0); printTowers(); switchTower(2, 1); printTowers();
-                 * switchTower(0, 2); printTowers(); switchTower(0, 1); printTowers();
-                 * switchTower(2, 1); printTowers();
-                 */
+                moves++;
             } catch (InvalidTowerException e) {
                 System.out.println("Invalid tower input");
             } catch (InvalidSwitchException e) {
                 System.out.println("Invalid switch");
             }
-            
-        }while(true);
-        
+
+        } while (!hasWon());
+        t.close();
+        if (moves <= MAX_MOVES) {
+            System.out.println("YOU DID AN EXCELLENT WORK!!!");
+            printTowers();
+            System.out.println("YOU DID AN EXCELLENT WORK!!!");
+        } else {
+            System.out.println("YOU WON!!!");
+            printTowers();
+            System.out.println("YOU WON!!!");
+            System.out.println("Moves you did: "+ moves);
+            System.out.println("With "+ N+" plates you could finish the game with "+MAX_MOVES);
+            System.out.println("Maybe try to do better next time!");
+        }
     }
 
     private static void initTowers() {
@@ -69,6 +74,7 @@ public class Main {
             s += spazi;
             for (int i = 0; i < l; i++)
                 s += towers[r][c];
+            // s+='_';
             s += spazi;
         }
         return s;
@@ -100,14 +106,19 @@ public class Main {
             throw new InvalidTowerException();
         int plateBeginId = scanTower(begin);
         int plateEndId = scanTower(end);
+
         /*
-         * if(towers[plateEndId][end]<towers[plateBeginId][begin]){
-         * towers[plateEndId][end] = towers[plateBeginId][begin];
-         * towers[plateBeginId][begin] = -1; }else{ throw new InvalidSwitchException();
-         * }
+         * if (towers[plateBeginId][begin] < towers[plateEndId][end] ||
+         * towers[plateBeginId][begin] > -1) { towers[plateEndId -
+         * (towers[plateEndId][end] != -1 ? 1 : 0)][end] = towers[plateBeginId][begin];
+         * towers[plateBeginId][begin] = -1; } else { throw new
+         * InvalidSwitchException(); }
          */
-        if (towers[plateBeginId][begin] < towers[plateEndId][end] || towers[plateBeginId][begin] > -1) {
-            towers[plateEndId - (towers[plateEndId][end] != -1 ? 1 : 0)][end] = towers[plateBeginId][begin];
+        if (towers[plateEndId][end] == -1) {
+            towers[plateEndId][end] = towers[plateBeginId][begin];
+            towers[plateBeginId][begin] = -1;
+        } else if (towers[plateEndId][end] > towers[plateBeginId][begin]) {
+            towers[plateEndId - 1][end] = towers[plateBeginId][begin];
             towers[plateBeginId][begin] = -1;
         } else {
             throw new InvalidSwitchException();
@@ -117,11 +128,19 @@ public class Main {
 
     private static int scanTower(int towerId) {
         int lvl = 0;
-        for (; lvl < N && towers[lvl][towerId] == -1; lvl++)
-            ;
-        if (lvl == N)
-            lvl--;
+        /*
+         * for (; lvl < N && towers[lvl][towerId] == -1; lvl++) ; //if (lvl == N)
+         * //lvl--; lvl = lvl==0?0:lvl-1;
+         */
+        while ((lvl < N - 1 && towers[lvl][towerId] == -1)) {
+            lvl++;
+        }
+
         return lvl;
+    }
+
+    private static boolean hasWon() {
+        return towers[0][1] == 0 || towers[0][2] == 0;
     }
 
 }
